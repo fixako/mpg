@@ -1,0 +1,53 @@
+{
+    "background_color": {
+        "x": "50",
+        "y": "76",
+        "z": "117"
+    },
+    "window_position": {
+        "x": "0",
+        "y": "37"
+    },
+    "window_size": {
+        "width": "1920",
+        "height": "1016"
+    },
+    "target": {
+        "color": {
+            "x": "255",
+            "y": "182",
+            "z": "10"
+        },
+        "speed": "0.20000000000000001",
+        "frequency": "0.55000000000000004",
+        "duration": "2.5",
+        "min_size": "0",
+        "max_size": "0.074999999999999997",
+        "min_opacity": "0",
+        "max_opacity": "1"
+    },
+    "click_target": {
+        "duration": "1",
+        "color": {
+            "x": "0",
+            "y": "255",
+            "z": "0"
+        },
+        "min_size": "0",
+        "max_size": "0.050000000000000003",
+        "min_opacity": "0.050000000000000003",
+        "max_opacity": "1"
+    },
+    "click_background": {
+        "duration": "1",
+        "color": {
+            "x": "255",
+            "y": "0",
+            "z": "0"
+        },
+        "min_size": "0",
+        "max_size": "0.050000000000000003",
+        "min_opacity": "0.050000000000000003",
+        "max_opacity": "1"
+    }
+}
