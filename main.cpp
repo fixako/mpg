@@ -7,6 +7,7 @@
 int main()
 {
     MpgController mpgc;
+    
     mpgc.startGame();
     return 0;
 }
