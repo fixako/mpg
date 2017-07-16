@@ -1,1 +1,0 @@
-/usr/bin/c++   -g   CMakeFiles/mpg.dir/main.cpp.o CMakeFiles/mpg.dir/mpg.cpp.o CMakeFiles/mpg.dir/mpg_view.cpp.o CMakeFiles/mpg.dir/mpg_model.cpp.o CMakeFiles/mpg.dir/mpg_controller.cpp.o  -o mpg -lglfw /usr/lib/x86_64-linux-gnu/libGLEW.so /usr/lib/x86_64-linux-gnu/libGLU.so /usr/lib/x86_64-linux-gnu/libGL.so 
