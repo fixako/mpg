@@ -17,9 +17,16 @@ using namespace glm;
 MpgView::MpgView(MpgModel* model)
 {
     this->model = model;
-    paused = false;
     initialize();
 }
+
+MpgView::~MpgView()
+{
+	glDeleteBuffers(1, &vbCircle);
+	glDeleteProgram(shaderProgramID);
+	glDeleteVertexArrays(1, &VertexArrayID);
+}
+
 
 void MpgView::initialize()
 {
@@ -74,8 +81,6 @@ void MpgView::initialize()
     // Ensure we can capture the escape key being pressed below
     glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
 
-    GLuint VertexArrayID;
-
     glGenVertexArrays(1, &VertexArrayID);
     glBindVertexArray(VertexArrayID);
 
@@ -93,8 +98,6 @@ void MpgView::initialize()
 
 void MpgView::update()
 {
-
-
     int windowWidth, windowHeight;
     glfwGetWindowSize(window, &windowWidth, &windowHeight);
 
@@ -120,29 +123,30 @@ void MpgView::update()
     glEnableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, vbCircle);
 
+	
+
     glClearColor(model->bgColor.x, model->bgColor.y, model->bgColor.z, 1.0f );
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    auto updateScene = [=](vector<Circle>& circles)
-    {
-        for (int i = 0; i < circles.size(); ++i)
-        {
-            glProgramUniform4fv(shaderProgramID, colorLocation, 1, &circles[i].color[0]);
-            glm::mat4 translationMatrix = glm::translate(glm::mat4(1.0f), circles[i].position);
-            double scaler = circles[i].size;
-            glm::mat4 scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(scaler, scaler, scaler));
-            glm::mat4 modelMatrix = translationMatrix * scalingMatrix;
-            glm::mat4 mvp = projectionMatrix * viewMatrix * modelMatrix;
+	for (size_t i = 0; i < CIRCLE_TYPE_SIZE; i++)
+	{
+		vector<Circle> circles = model->circles[i];
+		for (int j = 0; j < circles.size(); ++j)
+		{
+			vec4 color(circles[j].typeData->color, circles[j].opacity);
+			glProgramUniform4fv(shaderProgramID, colorLocation, 1, &color[0]);
+			glm::mat4 translationMatrix = glm::translate(glm::mat4(1.0f), circles[j].position);
+			double scaler = circles[j].size;
+			glm::mat4 scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(scaler, scaler, scaler));
+			glm::mat4 modelMatrix = translationMatrix * scalingMatrix;
 
-            glUniformMatrix4fv(mvpLocation, 1, GL_FALSE, &mvp[0][0]);
-            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
-            glDrawArrays(GL_TRIANGLE_FAN, 0, vbCircleSize);
-        }
-    };
+			glm::mat4 mvp = projectionMatrix * viewMatrix * modelMatrix;
 
-    updateScene(model->targets);
-    updateScene(model->clicks);
-    updateScene(model->missclicks);
+			glUniformMatrix4fv(mvpLocation, 1, GL_FALSE, &mvp[0][0]);
+			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+			glDrawArrays(GL_TRIANGLE_FAN, 0, vbCircleSize);
+		}
+	}
 
     glDisableVertexAttribArray(0);
     glfwSwapBuffers(window);
@@ -242,11 +246,11 @@ GLuint MpgView::loadShaders(const char *vertex_file_path, const char *fragment_f
     return ProgramID;
 }
 
-
 glm::vec2 MpgView::getVisibleCoordinates()
 {
     int width, height;
     glfwGetWindowSize(window, &width, &height);
+
     double x = (double)width / height;
     double y = 1;
     return glm::vec2(x, y);
@@ -254,7 +258,13 @@ glm::vec2 MpgView::getVisibleCoordinates()
 
 bool MpgView::shouldExit()
 {
-    return (glfwGetKey(window, GLFW_KEY_ESCAPE ) != GLFW_PRESS && glfwWindowShouldClose(window) == 0);
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS || glfwWindowShouldClose(window) == 1)
+	{
+		glfwTerminate();
+		return true;
+	}
+
+	return false;
 }
 
 GLFWwindow* MpgView::getWindow()

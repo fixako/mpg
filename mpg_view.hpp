@@ -16,25 +16,21 @@ class MpgView
 {
 private:
     GLFWwindow* window;
-    GLuint shaderProgramID;
+    GLuint shaderProgramID, VertexArrayID;;
     GLuint vbCircle, vbCircleSize;
     MpgModel* model;
-    bool paused;
 
     GLuint loadShaders(const char* vertex_file_path, const char* fragment_file_path);
 
 public:
     MpgView(MpgModel* model);
+	~MpgView();
+
     void initialize();
     void update();
     bool shouldExit();
     GLFWwindow* getWindow();
     glm::vec2 getVisibleCoordinates();
-
-    friend void keyPress(GLFWwindow* window, int key, int scancode, int action, int mods);
-    friend void mouseClick(GLFWwindow* window, int button, int action, int mods);
-
-    void setBackground(glm::vec3 color);
 };
 
 

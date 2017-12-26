@@ -10,32 +10,44 @@
 #include <glm/glm.hpp>
 #include <boost/property_tree/ptree.hpp>
 
+enum CircleType
+{
+	TARGET, TARGET_CLICK, BG_CLICK, CIRCLE_TYPE_SIZE
+};
+
+class DistFunction
+{
+public:
+	DistFunction();
+	DistFunction(double(*dist)(double), double a, double b, double min, double max, bool mirror);
+
+	double a, b;
+	double min, max;
+	double (*dist)(double);
+	bool mirror;
+
+	double operator() (double x);
+};
+
+struct CircleTypeData
+{
+	std::chrono::duration<double> deleteDuration;
+	glm::vec3 color;
+	double speed, minSize, maxSize, minOpacity, maxOpacity;
+	DistFunction sizeDist, opaciyDist;
+};
+
 class Circle
 {
 public:
-    class DistFunction
-    {
-    public:
-        DistFunction();
-        DistFunction(double (*dist)(double), double a, double b, double min, double max, bool mirror);
-
-        double a, b;
-        double min, max;
-        double (*dist)(double);
-        bool mirror;
-
-        double operator() (double x);
-    };
-
-    Circle();
+	~Circle();
+	Circle();
     Circle(glm::vec3 position);
 
     std::chrono::time_point<std::chrono::system_clock> creationTime, collisionTime;
-    std::chrono::duration<double> deleteDuration;
-    glm::vec4 color;
+	double opacity, size;
     glm::vec3 position, velocity, collisionPosition;
-    DistFunction sizeDist, opaciyDist;
-    double speed, size, minSize, maxSize, minOpacity, maxOpacity;
+	CircleTypeData* typeData;
 
     void update();
 };
@@ -43,15 +55,13 @@ public:
 class MpgModel
 {
 public:
-    std::vector<Circle> targets, clicks, missclicks;
-    glm::vec2 vc;
+	CircleTypeData* circleTypes;
+	std::vector<Circle> circles[CIRCLE_TYPE_SIZE];
     glm::vec3 bgColor;
-    boost::property_tree::ptree* appData;
+	glm::vec2 vc;
 
     MpgModel();
-    void addTarget();
-    void addClick(glm::vec3 position);
-    void addMissclick(glm::vec3 position);
+	void addCircle(glm::vec3* position, CircleType ctype);
     void wasPaused(std::chrono::duration<double> pauseDuration);
     void update();
 };
